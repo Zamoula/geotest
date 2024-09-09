@@ -55,6 +55,8 @@ export class DashboardPage implements OnInit, AfterViewInit, OnDestroy {
       this.initializeMap();
     }, 100); // Adjust this delay as needed
 
+    // Check if the user is online and sync
+    window.addEventListener('online', this.syncWithFirebase);
   }
 
   async initializeMap() {
@@ -115,6 +117,9 @@ export class DashboardPage implements OnInit, AfterViewInit, OnDestroy {
           return;
         }
         if (position) {
+          // Save position locally
+          this.savePositionLocally(position);
+
           const { latitude, longitude } = position.coords;
           this.updateMapPosition(latitude, longitude);
           // initialize user position
@@ -175,4 +180,26 @@ export class DashboardPage implements OnInit, AfterViewInit, OnDestroy {
 
     await alert.present();
   }
+
+  savePositionLocally(position: any) {
+    const positions = JSON.parse(localStorage.getItem('offlinePositions') || '[]');
+    positions.push({
+      latitude: position.coords.latitude,
+      longitude: position.coords.longitude,
+      timestamp: position.timestamp
+    });
+    localStorage.setItem('offlinePositions', JSON.stringify(positions));
+  }
+
+  syncWithFirebase() {
+    const positions = JSON.parse(localStorage.getItem('offlinePositions') || '[]');
+    if (positions.length > 0) {
+      this.users.forEach(user => {
+        console.warn('implement');
+      });
+      localStorage.removeItem('offlinePositions'); // Clear local storage after syncing
+    }
+  }
+  
+  
 }
