@@ -22,7 +22,7 @@ export class HomePage implements OnInit{
     this.storageService.init();
 
     let nameExist = await this.storageService.get('username');
-    if(!nameExist) {
+    if(nameExist) {
       this.router.navigate(['/dashboard']);
     }
   }
