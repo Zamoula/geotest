@@ -4,6 +4,8 @@ import * as L from 'leaflet';
 import { StorageService } from '../services/storage.service';
 import { addIcons } from 'ionicons';
 import { peopleOutline, settingsOutline, search } from 'ionicons/icons';
+import { FirebaseStorageService } from '../services/firebase-storage.service';
+import { AlertController } from '@ionic/angular';
 
 @Component({
   selector: 'app-dashboard',
@@ -24,39 +26,27 @@ export class DashboardPage implements OnInit, AfterViewInit, OnDestroy {
     this.isAlertOpen = isOpen;
   }
 
-  users: any[] = [{
-    "username": "bbleas0"
-  }, {
-    "username": "codonohue1"
-  }, {
-    "username": "wjosovitz2"
-  }, {
-    "username": "aleipelt3"
-  }, {
-    "username": "rrentilll4"
-  }, {
-    "username": "gcowdroy5"
-  }, {
-    "username": "dkobke6"
-  }, {
-    "username": "kwhyberd7"
-  }, {
-    "username": "iwims8"
-  }, {
-    "username": "erheaume9"
-  }];
+ users: any[] = [];
+
+ selectedUser!: any;
 
   longitude: any;
   latitude: any;
 
   constructor(
-    private storage: StorageService
+    private storage: StorageService,
+    private firebaseCrud: FirebaseStorageService,
+    private alertController: AlertController
   ) {
     addIcons({ peopleOutline, settingsOutline });
   }
 
   async ngOnInit() {
     this.username = await this.storage.get('username');
+    this.firebaseCrud.getItems().subscribe((data) => {
+      this.users = data;
+      console.warn(this.users);
+    })
   }
 
   ngAfterViewInit(): void {
@@ -64,6 +54,7 @@ export class DashboardPage implements OnInit, AfterViewInit, OnDestroy {
     setTimeout(() => {
       this.initializeMap();
     }, 100); // Adjust this delay as needed
+
   }
 
   async initializeMap() {
@@ -74,6 +65,17 @@ export class DashboardPage implements OnInit, AfterViewInit, OnDestroy {
 
       this.longitude = coordinates.coords.longitude;
       this.latitude = coordinates.coords.latitude;
+
+      // initialize user position
+      const user = {
+        "latitude": this.latitude,
+        "longitude": this.longitude,
+        "name": this.username,
+        "timestamp": Date.now()
+      };
+
+      // save position coordinates
+      //this.firebaseCrud.updateItem(this.username, user);
 
       this.map = L.map('map').setView([coordinates.coords.latitude, coordinates.coords.longitude], 13);
 
@@ -115,6 +117,17 @@ export class DashboardPage implements OnInit, AfterViewInit, OnDestroy {
         if (position) {
           const { latitude, longitude } = position.coords;
           this.updateMapPosition(latitude, longitude);
+          // initialize user position
+      const user = {
+        "latitude": latitude,
+        "longitude": longitude,
+        "name": this.username,
+        "timestamp": Date.now()
+      };
+
+      // save position coordinates
+      this.firebaseCrud.updateItem(this.username, user);
+
         }
       });
     } catch (error) {
@@ -144,5 +157,22 @@ export class DashboardPage implements OnInit, AfterViewInit, OnDestroy {
     if (this.map) {
       this.map.invalidateSize(); // Ensure the map is resized properly
     }
+  }
+
+  async presentAlert(name:any) {
+    let userPromise = this.firebaseCrud.getItem(name);
+    userPromise.subscribe((data) => {
+      console.warn(data);
+      this.selectedUser = data;
+    });
+    console.warn(this.selectedUser);
+    const alert = await this.alertController.create({
+      header: name,
+      subHeader: 'Details',
+      message: `(${this.selectedUser.longitude},${this.selectedUser.latitude})`,
+      buttons: ['OK']
+    });
+
+    await alert.present();
   }
 }

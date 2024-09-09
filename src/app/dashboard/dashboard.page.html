@@ -29,33 +29,16 @@
         </ion-card-header>
         <ion-card-content>
           <ion-list>
-            @for(user of users; track user.username; let isLast = $last) {
+            @for(user of users; track user.index;) {
               <ion-item>
                 <ion-thumbnail slot="start">
                   <ion-icon class="user-icon" name="person-circle-outline"></ion-icon>
                 </ion-thumbnail>
-                <ion-label>{{user.username}}</ion-label>
-                <ion-button color="dark" (click)="setOpen(true)" shape="round">
+                <ion-label>{{user.name}}</ion-label>
+                <ion-button color="dark" (click)="presentAlert(user.name)" shape="round">
                   <ion-icon slot="icon-only" name="compass-outline"></ion-icon>
                 </ion-button>
-                <ion-alert
-                  [isOpen]="isAlertOpen"
-                  trigger="user-localisation-alert"
-                  [header]="user.username"
-                  subHeader="Details"
-                  message="A message should be a short, complete sentence."
-                  [buttons]="alertButtons"
-                  (didDismiss)="setOpen(false)"
-                ></ion-alert>
               </ion-item>
-              @if(isLast) {
-                <ion-item lines="none">
-                <ion-thumbnail slot="start">
-                  <ion-icon class="user-icon" name="person-circle-outline"></ion-icon>
-                </ion-thumbnail>
-                <ion-label>{{user.username}}</ion-label>
-              </ion-item>
-              }
             }
           </ion-list>
         </ion-card-content>
