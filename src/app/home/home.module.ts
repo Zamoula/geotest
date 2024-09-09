@@ -5,6 +5,8 @@ import { FormsModule } from '@angular/forms';
 import { HomePage } from './home.page';
 
 import { HomePageRoutingModule } from './home-routing.module';
+import { StorageService } from '../services/storage.service';
+import { IonicStorageModule } from '@ionic/storage-angular';
 
 
 @NgModule({
@@ -12,8 +14,10 @@ import { HomePageRoutingModule } from './home-routing.module';
     CommonModule,
     FormsModule,
     IonicModule,
-    HomePageRoutingModule
+    HomePageRoutingModule,
+    IonicStorageModule.forRoot(),
   ],
-  declarations: [HomePage]
+  declarations: [HomePage],
+  providers: [StorageService]
 })
 export class HomePageModule {}

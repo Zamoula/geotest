@@ -1,18 +1,27 @@
-import { Component } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
+import { StorageService } from '../services/storage.service';
 
 @Component({
   selector: 'app-home',
   templateUrl: 'home.page.html',
   styleUrls: ['home.page.scss'],
 })
-export class HomePage {
+export class HomePage implements OnInit{
 
   username: string = '';
 
-  constructor(private router: Router) {}
+  constructor(
+    private router: Router,
+    private storageService: StorageService
+  ) {}
 
-  submit() {
+  async ngOnInit() {
+    this.storageService.init();
+  }
+
+  async submit() {
+    await this.storageService.set('username', this.username);
     this.router.navigate(['/dashboard']);
   }
 

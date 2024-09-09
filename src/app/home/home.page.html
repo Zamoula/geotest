@@ -22,7 +22,7 @@
       </ion-item>
       
       <ion-item>
-        <ion-button expand="full" color="dark" (click)="submit()">Enter</ion-button>
+        <ion-button expand="full" color="dark" (click)="submit()" [disabled]="username == ''">Enter</ion-button>
       </ion-item>
     </ion-list>
   </div>

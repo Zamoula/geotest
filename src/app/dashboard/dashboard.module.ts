@@ -7,14 +7,18 @@ import { IonicModule } from '@ionic/angular';
 import { DashboardPageRoutingModule } from './dashboard-routing.module';
 
 import { DashboardPage } from './dashboard.page';
+import { IonicStorageModule } from '@ionic/storage-angular';
+import { StorageService } from '../services/storage.service';
 
 @NgModule({
   imports: [
     CommonModule,
     FormsModule,
     IonicModule,
-    DashboardPageRoutingModule
+    DashboardPageRoutingModule,
+    IonicStorageModule.forRoot(),
   ],
-  declarations: [DashboardPage]
+  declarations: [DashboardPage],
+  providers: [StorageService]
 })
 export class DashboardPageModule {}

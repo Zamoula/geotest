@@ -1,13 +1,81 @@
-<ion-header [translucent]="true">
-  <ion-toolbar>
-    <ion-title>dashboard</ion-title>
-  </ion-toolbar>
-</ion-header>
+<ion-tabs>
+    <ion-tab-bar slot="bottom">
+      <ion-tab-button tab="map">
+        <ion-icon name="map-outline"></ion-icon>
+        <ion-label>Map</ion-label>
+      </ion-tab-button>
+    <ion-tab-button tab="users">
+      <ion-icon name="people-outline"></ion-icon>
+      Users
+    </ion-tab-button>
+    <ion-tab-button tab="profile">
+      <ion-icon name="settings-outline"></ion-icon>
+      Profile
+    </ion-tab-button>
+  </ion-tab-bar>
 
-<ion-content [fullscreen]="true">
-  <ion-header collapse="condense">
-    <ion-toolbar>
-      <ion-title size="large">dashboard</ion-title>
-    </ion-toolbar>
-  </ion-header>
-</ion-content>
+  <ion-tab tab="map">
+    <ion-content>
+      <div id="map" style="height: 100%;"></div>
+    </ion-content>
+  </ion-tab>
+
+  <ion-tab tab="users">
+    <ion-content>
+      <ion-card>
+        <ion-card-header>
+          <ion-card-title>Users</ion-card-title>
+          <ion-card-subtitle>telcotec workers</ion-card-subtitle>
+        </ion-card-header>
+        <ion-card-content>
+          <ion-list>
+            @for(user of users; track user.username; let isLast = $last) {
+              <ion-item>
+                <ion-thumbnail slot="start">
+                  <ion-icon class="user-icon" name="person-circle-outline"></ion-icon>
+                </ion-thumbnail>
+                <ion-label>{{user.username}}</ion-label>
+                <ion-button color="dark" (click)="setOpen(true)" shape="round">
+                  <ion-icon slot="icon-only" name="compass-outline"></ion-icon>
+                </ion-button>
+                <ion-alert
+                  [isOpen]="isAlertOpen"
+                  trigger="user-localisation-alert"
+                  [header]="user.username"
+                  subHeader="Details"
+                  message="A message should be a short, complete sentence."
+                  [buttons]="alertButtons"
+                  (didDismiss)="setOpen(false)"
+                ></ion-alert>
+              </ion-item>
+              @if(isLast) {
+                <ion-item lines="none">
+                <ion-thumbnail slot="start">
+                  <ion-icon class="user-icon" name="person-circle-outline"></ion-icon>
+                </ion-thumbnail>
+                <ion-label>{{user.username}}</ion-label>
+              </ion-item>
+              }
+            }
+          </ion-list>
+        </ion-card-content>
+      </ion-card>
+    </ion-content>
+  </ion-tab>
+
+  <ion-tab tab="profile">
+    <ion-content>
+      <ion-card color="secondary">
+        <ion-card-header>
+          <ion-card-title>{{username}}</ion-card-title>
+          <ion-card-subtitle>Profile</ion-card-subtitle>
+        </ion-card-header>
+      
+        <ion-card-content>
+          <h3>Longitude : <strong>{{longitude}}</strong></h3>
+          <h3>Latitude : <strong>{{latitude}}</strong></h3>
+        </ion-card-content>
+      </ion-card>
+    </ion-content>
+  </ion-tab>
+</ion-tabs>
