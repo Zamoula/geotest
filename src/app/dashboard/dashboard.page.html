@@ -17,6 +17,21 @@
   <ion-tab tab="map">
     <ion-content>
       <div id="map" style="height: 100%;"></div>
+      <div class="select-menu">
+        <ion-list>
+          <ion-item>
+            <ion-select aria-label="map"
+              placeholder="Select options"
+              (ionChange)="handleChange($event)"
+              (ionCancel)="handleCancel()"
+              (ionDismiss)="handleDismiss()"
+              >
+              <ion-select-option value="cities">Cities</ion-select-option>
+              <ion-select-option value="delegations">Delegations</ion-select-option>
+            </ion-select>
+          </ion-item>
+        </ion-list>
+      </div>
     </ion-content>
   </ion-tab>
 
@@ -63,18 +78,3 @@
   </ion-tab>
 </ion-tabs>
 
-<div class="select-menu">
-  <ion-list>
-    <ion-item>
-      <ion-select aria-label="map"
-        placeholder="Select options"
-        (ionChange)="handleChange($event)"
-        (ionCancel)="handleCancel()"
-        (ionDismiss)="handleDismiss()"
-        >
-        <ion-select-option value="cities">Cities</ion-select-option>
-        <ion-select-option value="delegations">Delegations</ion-select-option>
-      </ion-select>
-    </ion-item>
-  </ion-list>
-</div>

@@ -118,22 +118,6 @@ export class DashboardPage implements OnInit, AfterViewInit, OnDestroy {
         attribution: '© Telcotec'
       }).addTo(this.map);
 
-      // Draw data on map
-      /*
-        L.geoJSON(this.tunisiaCitiesgeoJsonData, {
-          style: (feature) => {
-            return {
-              color: '#48CFCB',
-              weight: 2,
-              fillOpacity: 0.2
-            };
-          },
-          onEachFeature: (feature, layer) => {
-            layer.bindPopup(`<b>${feature.properties.name}</b>`); // Customize as needed
-          }
-        }).addTo(this.map);
-        */
-
         this.loadGeoJSON(this.selectedview);
       const customIcon = L.icon({
         iconUrl: '../assets/icon/pos.png', // Path to your custom icon
@@ -167,7 +151,7 @@ export class DashboardPage implements OnInit, AfterViewInit, OnDestroy {
           fillOpacity: 0.2
         }),
         onEachFeature: (feature, layer) => {
-          layer.bindPopup(`<b>${feature.properties.name}</b>`);
+          layer.bindPopup(`<b>${feature.properties.NAME_1}</b>`);
         }
       }).addTo(this.map);
 
@@ -183,23 +167,13 @@ export class DashboardPage implements OnInit, AfterViewInit, OnDestroy {
           fillOpacity: 0.2
         }),
         onEachFeature: (feature, layer) => {
-          layer.bindPopup(`<b>${feature.properties.name}</b>`);
+          layer.bindPopup(`<b>${feature.properties.NAME_2}</b>`);
         }
       }).addTo(this.map);
 
       // Fit the map to the new GeoJSON bounds
       const bounds = this.currentLayer.getBounds();
       this.map?.fitBounds(bounds);
-    }
-  }
-
-  getFeatureColor(feature: any): string {
-    if (feature.properties.someProperty === 'cities') {
-      return '#48CFCB';
-    } else if (feature.properties.someProperty === 'delegations') {
-      return '#7FA1C3';
-    } else {
-      return '#48CFCB';
     }
   }
 

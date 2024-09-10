@@ -10,6 +10,10 @@
   }
 
   .select-menu {
-    width: 50vw;
-    margin-left: auto;
+    top: 0;
+    right: 0;
+    width: 40vw;
+    height: 100px;
+    position: fixed;
+    z-index: 1000;
   }
