@@ -6,6 +6,7 @@ import { addIcons } from 'ionicons';
 import { peopleOutline, settingsOutline, search } from 'ionicons/icons';
 import { FirebaseStorageService } from '../services/firebase-storage.service';
 import { AlertController } from '@ionic/angular';
+import {HttpClient} from '@angular/common/http';
 
 @Component({
   selector: 'app-dashboard',
@@ -22,6 +23,13 @@ export class DashboardPage implements OnInit, AfterViewInit, OnDestroy {
 
   isAlertOpen = false;
 
+  tunisiaCitiesgeoJsonData: any;
+  tunisiaDelegationgeoJsonData: any;
+
+  selectedview: any = "cities";
+
+  currentLayer: L.GeoJSON | undefined;
+
   setOpen(isOpen: boolean) {
     this.isAlertOpen = isOpen;
   }
@@ -33,12 +41,34 @@ export class DashboardPage implements OnInit, AfterViewInit, OnDestroy {
   longitude: any;
   latitude: any;
 
+  datasets = {
+    dataset1: '../../assets/data/Tun_adm1.json',
+    dataset2: '../../assets/data/TUN_adm2.geojson'
+  };
+
   constructor(
     private storage: StorageService,
     private firebaseCrud: FirebaseStorageService,
-    private alertController: AlertController
+    private alertController: AlertController,
+    http: HttpClient
   ) {
     addIcons({ peopleOutline, settingsOutline });
+
+    //get cities data
+    http.get('../../assets/data/TUN_adm1.geojson').subscribe((data: any) => {
+      this.tunisiaCitiesgeoJsonData = data;
+      console.log(this.tunisiaCitiesgeoJsonData);
+    }, error => {
+      console.error('Error loading GeoJSON data:', error);
+    });
+
+    //get delegations data
+    http.get('../../assets/data/TUN_adm2.geojson').subscribe((data: any) => {
+      this.tunisiaDelegationgeoJsonData = data;
+      console.log(this.tunisiaDelegationgeoJsonData);
+    }, error => {
+      console.error('Error loading GeoJSON data:', error);
+    });
   }
 
   async ngOnInit() {
@@ -46,7 +76,10 @@ export class DashboardPage implements OnInit, AfterViewInit, OnDestroy {
     this.firebaseCrud.getItems().subscribe((data) => {
       this.users = data;
       console.warn(this.users);
-    })
+    });
+
+    //this.loadGeoJson();
+    this.selectedview = "cities";
   }
 
   ngAfterViewInit(): void {
@@ -79,12 +112,29 @@ export class DashboardPage implements OnInit, AfterViewInit, OnDestroy {
       // save position coordinates
       //this.firebaseCrud.updateItem(this.username, user);
 
-      this.map = L.map('map').setView([coordinates.coords.latitude, coordinates.coords.longitude], 13);
+      this.map = L.map('map').setView([33.8869, 9.5375], 7);
 
       L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
         attribution: '© Telcotec'
       }).addTo(this.map);
 
+      // Draw data on map
+      /*
+        L.geoJSON(this.tunisiaCitiesgeoJsonData, {
+          style: (feature) => {
+            return {
+              color: '#48CFCB',
+              weight: 2,
+              fillOpacity: 0.2
+            };
+          },
+          onEachFeature: (feature, layer) => {
+            layer.bindPopup(`<b>${feature.properties.name}</b>`); // Customize as needed
+          }
+        }).addTo(this.map);
+        */
+
+        this.loadGeoJSON(this.selectedview);
       const customIcon = L.icon({
         iconUrl: '../assets/icon/pos.png', // Path to your custom icon
         iconSize: [32, 32], // Size of the icon
@@ -101,6 +151,55 @@ export class DashboardPage implements OnInit, AfterViewInit, OnDestroy {
       this.startTracking();
     } catch (error) {
       console.error('Could not get location', error);
+    }
+  }
+
+  loadGeoJSON(dataset: any): void {
+    if (this.currentLayer) {
+      this.map?.removeLayer(this.currentLayer); // Remove current layer if exists
+    }
+
+    if(dataset == 'cities') {
+      this.currentLayer = L.geoJSON(this.tunisiaCitiesgeoJsonData, {
+        style: (feature) => ({
+          color: '#48CFCB',
+          weight: 2,
+          fillOpacity: 0.2
+        }),
+        onEachFeature: (feature, layer) => {
+          layer.bindPopup(`<b>${feature.properties.name}</b>`);
+        }
+      }).addTo(this.map);
+
+      // Fit the map to the new GeoJSON bounds
+      const bounds = this.currentLayer.getBounds();
+      this.map?.fitBounds(bounds);
+    }
+    else if(dataset == 'delegations') {
+      this.currentLayer = L.geoJSON(this.tunisiaDelegationgeoJsonData, {
+        style: (feature) => ({
+          color: '#7FA1C3',
+          weight: 2,
+          fillOpacity: 0.2
+        }),
+        onEachFeature: (feature, layer) => {
+          layer.bindPopup(`<b>${feature.properties.name}</b>`);
+        }
+      }).addTo(this.map);
+
+      // Fit the map to the new GeoJSON bounds
+      const bounds = this.currentLayer.getBounds();
+      this.map?.fitBounds(bounds);
+    }
+  }
+
+  getFeatureColor(feature: any): string {
+    if (feature.properties.someProperty === 'cities') {
+      return '#48CFCB';
+    } else if (feature.properties.someProperty === 'delegations') {
+      return '#7FA1C3';
+    } else {
+      return '#48CFCB';
     }
   }
 
@@ -141,7 +240,7 @@ export class DashboardPage implements OnInit, AfterViewInit, OnDestroy {
   }
 
   updateMapPosition(lat: number, lng: number) {
-    this.map.setView([lat, lng], 13); // Update the map view
+    this.map.setView([lat, lng], 7); // Update the map view
     this.userMarker.setLatLng([lat, lng]); // Update the marker position
   }
 
@@ -200,6 +299,19 @@ export class DashboardPage implements OnInit, AfterViewInit, OnDestroy {
       localStorage.removeItem('offlinePositions'); // Clear local storage after syncing
     }
   }
-  
-  
+
+  // selection methods
+  handleChange(e:any) {
+    this.selectedview = e.detail.value;
+    this.loadGeoJSON(this.selectedview);
+    console.log('ionChange fired with value: ' + this.selectedview);
+  }
+
+  handleCancel() {
+    console.log('ionCancel fired');
+  }
+
+  handleDismiss() {
+    console.log('ionDismiss fired');
+  }
 }

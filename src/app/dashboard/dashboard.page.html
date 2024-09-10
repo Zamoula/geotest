@@ -62,3 +62,19 @@
     </ion-content>
   </ion-tab>
 </ion-tabs>
+
+<div class="select-menu">
+  <ion-list>
+    <ion-item>
+      <ion-select aria-label="map"
+        placeholder="Select options"
+        (ionChange)="handleChange($event)"
+        (ionCancel)="handleCancel()"
+        (ionDismiss)="handleDismiss()"
+        >
+        <ion-select-option value="cities">Cities</ion-select-option>
+        <ion-select-option value="delegations">Delegations</ion-select-option>
+      </ion-select>
+    </ion-item>
+  </ion-list>
+</div>

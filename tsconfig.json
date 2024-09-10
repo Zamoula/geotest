@@ -32,3 +32,6 @@
     "strictTemplates": true
   }
 }
+/** 
+    "skipLibCheck": true, ====> added for firebase
+*/

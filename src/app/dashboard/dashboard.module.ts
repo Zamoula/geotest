@@ -9,6 +9,7 @@ import { DashboardPageRoutingModule } from './dashboard-routing.module';
 import { DashboardPage } from './dashboard.page';
 import { IonicStorageModule } from '@ionic/storage-angular';
 import { StorageService } from '../services/storage.service';
+import { provideHttpClient } from '@angular/common/http';
 
 @NgModule({
   imports: [
@@ -19,6 +20,9 @@ import { StorageService } from '../services/storage.service';
     IonicStorageModule.forRoot(),
   ],
   declarations: [DashboardPage],
-  providers: [StorageService]
+  providers: [
+    StorageService,
+    provideHttpClient()
+  ]
 })
 export class DashboardPageModule {}
